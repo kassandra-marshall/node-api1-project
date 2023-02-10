@@ -59,9 +59,9 @@ server.post('/api/users', (req, res) => {
 });
 
 server.put('/api/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, bio } = req.body;
     try {
+        const { id } = req.params;
+        const { name, bio } = req.body;
         const updatedUser = await User.update(id, {name, bio})
         if (!updatedUser){
             res.status(404).json({
@@ -86,10 +86,28 @@ server.put('/api/users/:id', async (req, res) => {
     }
 });
 
-// server.delete('/api/users/:id', async (req, res) => {
-
-//     // users = users.filter(user => user.id !== req.params.id);
-//     // res.status(200).json(users);
-// });
+server.delete('/api/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const possibleUser = await User.findById(id)
+        if(!possibleUser){
+            res.status(404).json({
+                message: 'The user with the specified ID does not exist'
+            })
+        }else {
+            const deletedUser = await User.remove(id)
+            res.json(deletedUser)
+        }
+    } catch (err) {
+        res.status(500).json({
+            message: 'The user could not be removed',
+            err: err.message,
+            stack: err.stack
+        }) 
+        
+    }
+    // users = users.filter(user => user.id !== req.params.id);
+    // res.status(200).json(users);
+});
 
 module.exports = server; // EXPORT YOUR SERVER instead of {}
